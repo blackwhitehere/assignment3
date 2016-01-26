@@ -1,0 +1,14 @@
+case class Dot(arg1: Block[Vector], arg2: Block[Vector]) extends Block[Double] {
+  def forward(): Double = {
+    output = arg1.forward() dot arg2.forward()
+    output
+  }
+  def backward(gradient: Double): Unit ={
+    arg1.backward(arg2.forward() :* gradient)
+    arg2.backward(arg1.forward() :* gradient)
+  }
+  def update(learningRate: Double): Unit ={
+    arg1.update(learningRate)
+    arg2.update(learningRate)
+  }
+}
