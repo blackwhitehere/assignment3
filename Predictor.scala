@@ -4,6 +4,7 @@ import collection.mutable.MutableList
 
 /**
  * Created by stan on 26-Jan-16.
+ * This is a new object to apply trained model on test set and saved results in required format
  */
 object Predictor {
   def apply(model:Model, corpus:String): Unit ={
