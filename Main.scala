@@ -26,6 +26,7 @@ object Main extends App {
   }
 
   var lastEpochValAcc = 0.0
+  //changed to evaluate on a given model
   def epochHook(model:Model, iter: Int, accLoss: Double): Unit = {
     println("Epoch %4d\tLoss %8.4f\tTrain Acc %4.2f\tDev Acc %4.2f".format(
       iter, accLoss, 100 * Evaluator(model, trainSetName), 100*Evaluator(model, validationSetName)))
