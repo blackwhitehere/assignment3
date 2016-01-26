@@ -27,9 +27,11 @@ object Main extends App {
 
   var lastEpochValAcc = 0.0
   //changed to evaluate on a given model
-  def epochHook(model:Model, iter: Int, accLoss: Double): Unit = {
+  def epochHook(model:Model, iter: Int, accLoss: Double): (Int,Double,Double,Double) = {
     println("Epoch %4d\tLoss %8.4f\tTrain Acc %4.2f\tDev Acc %4.2f".format(
       iter, accLoss, 100 * Evaluator(model, trainSetName), 100*Evaluator(model, validationSetName)))
+    val rtn = (iter,accLoss,100 * Evaluator(model, trainSetName), 100*Evaluator(model, validationSetName))
+    rtn
   }
 
   //StochasticGradientDescentLearner(model, trainSetName, 10, learningRate, epochHook)
@@ -38,7 +40,6 @@ object Main extends App {
   val learningRateParams = Seq(0.1)//(0.001, 0.01, 0.05, 0.1)
   val wrdDimParams = Seq(10)//(5,10,15,25)
   val ParamTriplets = collection.mutable.HashMap[(Double,Double,Int),Double]()
-
   for (vecRegParam <- vecRegParamas){
     for (learningRateParam <- learningRateParams) {
       for (wrdDimParam <- wrdDimParams) {
@@ -56,8 +57,11 @@ object Main extends App {
     bestRegularizationParam,bestLearningRate,bestWrdDim)
   )
   val bestModel: Model = new SumOfWordVectorsModel(bestWrdDim, bestRegularizationParam)
-  StochasticGradientDescentLearner(bestModel, trainSetName, 5, bestLearningRate, epochHook)
+  val listOfStats=StochasticGradientDescentLearner(bestModel, trainSetName, 5, bestLearningRate, epochHook)
   Predictor(bestModel, "test")
+  val statsString=listOfStats.mkString("\n")
+  scala.tools.nsc.io.File("stats.csv").writeAll(statsString)
+
 
 
   /**
