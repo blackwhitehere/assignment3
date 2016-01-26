@@ -75,7 +75,7 @@ trait Model {
  */
 class SumOfWordVectorsModel(embeddingSize: Int, regularizationStrength: Double = 0.0) extends Model {
   /**
-   * We use a lookup table to keep track of the word representations
+   * I removed dependency on lookuptable so that each time a new class object is created a new HashMap is created
    */
   override val vectorParams = mutable.HashMap[String, VectorParam]()
   /**
