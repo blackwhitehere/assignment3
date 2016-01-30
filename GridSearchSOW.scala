@@ -1,6 +1,4 @@
 package uk.ac.ucl.cs.mr.statnlpbook.assignment3
-
-
 import scala.util.Random
 
 /**
@@ -28,7 +26,7 @@ object GridSearchSOW extends App {
       for (wrdDimParam <- wrdDimParams) {
         lastEpochValAcc = 0.0
         val model: Model = new SumOfWordVectorsModel(wrdDimParam, vecRegParam)
-        StochasticGradientDescentLearner(model, trainSetName, 1, learningRateParam, epochHook)
+        StochasticGradientDescentLearner(model, trainSetName, 20, learningRateParam, epochHook)
         lastEpochValAcc=100*Evaluator(model, validationSetName)
         ParamTriplets += (vecRegParam,learningRateParam,wrdDimParam) -> lastEpochValAcc
       }
@@ -40,7 +38,7 @@ object GridSearchSOW extends App {
     bestRegularizationParam,bestLearningRate,bestWrdDim)
   )
   val bestModel: Model = new SumOfWordVectorsModel(bestWrdDim, bestRegularizationParam) //best steup - 15,0.15
-  val listOfStats=StochasticGradientDescentLearner(bestModel, trainSetName, 1, bestLearningRate, epochHook) //best setup -0.005
+  val listOfStats=StochasticGradientDescentLearner(bestModel, trainSetName, 40, bestLearningRate, epochHook) //best setup -0.005
   Predictor(bestModel, "test")
   val statsString=listOfStats.mkString("\n")
 
