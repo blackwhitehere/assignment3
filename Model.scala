@@ -134,7 +134,17 @@ class RecurrentNeuralNetworkModel(embeddingSize: Int, hiddenSize: Int,
   def wordToVector(word: String): Block[Vector] =LookupTable.addTrainableWordVector(word,embeddingSize)
 
   def wordVectorsToSentenceVector(words: Seq[Block[Vector]]): Block[Vector] ={
-    words.foldLeft(vectorParams("param_h0"):Block[Vector])((a,b)=>Tanh(Sum(Seq(Mul(matrixParams("param_Wh"),a),Mul(matrixParams("param_Wx"),b),vectorParams("param_b")))))
+    words.foldLeft(vectorParams("param_h0"):Block[Vector])((a,b)=>
+      Tanh(
+        Sum(
+          Seq(
+            Mul(matrixParams("param_Wh"),a),
+            Mul(matrixParams("param_Wx"),b),
+            vectorParams("param_b")
+          )
+        )
+      )
+    )
   }
 
 
