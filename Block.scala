@@ -52,7 +52,7 @@ trait DefaultInitialization {
  * This trait defines a default way of initializing weights of parameters
  */
 trait GaussianDefaultInitialization extends DefaultInitialization {
-  def defaultInitialization(): Double = random.nextGaussian() * 0.1
+  def defaultInitialization(): Double = random.nextGaussian() * 0.2
 }
 
 /**

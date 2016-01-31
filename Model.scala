@@ -102,13 +102,6 @@ class SumOfWordVectorsModel(embeddingSize: Int, regularizationStrength: Double =
 
 }
 
-
-
-
-
-
-
-
 /**
  * Problem 3
  * A recurrent neural network model
@@ -120,18 +113,22 @@ class SumOfWordVectorsModel(embeddingSize: Int, regularizationStrength: Double =
 class RecurrentNeuralNetworkModel(embeddingSize: Int, hiddenSize: Int,
                                   vectorRegularizationStrength: Double = 0.0,
                                   matrixRegularizationStrength: Double = 0.0) extends Model {
-  override val vectorParams: mutable.HashMap[String, VectorParam] =
-    LookupTable.trainableWordVectors
+  override val vectorParams = mutable.HashMap[String, VectorParam]()
   vectorParams += "param_w" -> VectorParam(hiddenSize)
   vectorParams += "param_h0" -> VectorParam(hiddenSize)
   vectorParams += "param_b" -> VectorParam(hiddenSize)
 
-  override val matrixParams: mutable.HashMap[String, MatrixParam] =
-    new mutable.HashMap[String, MatrixParam]()
+  override val matrixParams: mutable.HashMap[String, MatrixParam] = new mutable.HashMap[String, MatrixParam]()
   matrixParams += "param_Wx" -> MatrixParam(hiddenSize, embeddingSize)
   matrixParams += "param_Wh" -> MatrixParam(hiddenSize, hiddenSize)
 
-  def wordToVector(word: String): Block[Vector] =LookupTable.addTrainableWordVector(word,embeddingSize)
+  def wordToVector(word: String): Block[Vector] ={
+    if (vectorParams.contains(word)) {
+      vectorParams(word)
+    } else {
+      vectorParams.getOrElseUpdate(word, VectorParam(embeddingSize))
+    }
+  }
 
   def wordVectorsToSentenceVector(words: Seq[Block[Vector]]): Block[Vector] ={
     words.foldLeft(vectorParams("param_h0"):Block[Vector])((a,b)=>
@@ -146,7 +143,6 @@ class RecurrentNeuralNetworkModel(embeddingSize: Int, hiddenSize: Int,
       )
     )
   }
-
 
   def scoreSentence(sentence: Block[Vector]): Block[Double] = Sigmoid(Dot(vectorParams("param_w"),sentence))
 
