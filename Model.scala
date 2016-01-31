@@ -115,8 +115,7 @@ class SumOfWordVectorsModel(embeddingSize: Int, regularizationStrength: Double =
 class RecurrentNeuralNetworkModel(embeddingSize: Int, hiddenSize: Int,
                                   vectorRegularizationStrength: Double = 0.0,
                                   matrixRegularizationStrength: Double = 0.0) extends Model {
-  override val vectorParams :mutable.HashMap[String, VectorParam] =
-    LookupTable.trainableWordVectors
+  override val vectorParams :mutable.HashMap[String, VectorParam] = mutable.HashMap[String, VectorParam]()
   vectorParams += "param_w" -> VectorParam(hiddenSize)
   vectorParams += "param_h0" -> VectorParam(hiddenSize)
   vectorParams += "param_b" -> VectorParam(hiddenSize)
