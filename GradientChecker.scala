@@ -1,6 +1,7 @@
 package uk.ac.ucl.cs.mr.statnlpbook.assignment3
 
 import breeze.linalg.{QuasiTensor, TensorLike, sum}
+import breeze.linalg.{DenseMatrix, QuasiTensor, TensorLike, sum}
 import breeze.numerics._
 
 /**
@@ -75,6 +76,10 @@ object GradientChecker extends App {
     * A very silly block to test if gradient checking is working.
     * Will only work if the implementation of the Dot block is already correct
     */
+  // for problem2
+  val a = vec(-1.5, 1.0, 1.5, 0.5)
+  val b = VectorParam(4)
+  b.set(vec(1.0, 2.0, -0.5, 2.5))
 
   /*val a = VectorParam(15)
   val b = VectorParam(15)
@@ -103,11 +108,24 @@ object GradientChecker extends App {
   val sentence = model.wordVectorsToSentenceVector(Seq(word1,word2))
   val score = model.scoreSentence(sentence)
   val l2reg = model.regularizer(Seq(word1,word2))
+  val a1:Block[Vector] = a
+  val b1 = MatrixParam(2,4)
+  b1.set(DenseMatrix((1.0,1.5,-0.5,1.5),(1.0,1.0,-0.6,1.4)))
+  val b2 = MatrixParam(2,4)
+  b2.set(DenseMatrix((1.2,-1.0,-0.5,1.7),(1.3,1.1,-0.6,1.6)))
+  val b3 = VectorParam(2)
+  b.set(vec(1.0, 1.9))
 
   GradientChecker(score,model.vectorParams("the"))
   GradientChecker(l2reg,model.vectorParams("the"))
   GradientChecker(model.loss(Seq("my","the"),false),model.vectorParams("the"))
+  val c = vec(1,2,3,1)
+  val d = Seq[Block[Vector]](a,c)
+  //val simpleBlock = {
+  //  Sigmoid(Dot(Sum(d),b))
+  //}
 
+  val simpleBlock10 = Sigmoid(Dot((Tanh(Sum(Seq(Mul(b1,a1),Mul(b2,a1))))),b3))
 
   /*
     //mul
@@ -120,4 +138,5 @@ object GradientChecker extends App {
   val b = VectorParam(3)
   val simpleBlock = Dot(Tanh(Mul(a,b)),b)
   GradientChecker(simpleBlock, b)*/
+  GradientChecker(simpleBlock10, b3)
 }
