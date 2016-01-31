@@ -153,6 +153,7 @@ case class VectorParam(dim: Int, clip: Double = 10.0) extends ParamBlock[Vector]
  * A block representing the sum of vectors
  * @param args a sequence of blocks that evaluate to vectors
  */
+
 case class Sum(args: Seq[Block[Vector]]) extends Block[Vector] {
   def forward(): Vector = {
       output = args.map(_.forward()).reduce(_:+_)

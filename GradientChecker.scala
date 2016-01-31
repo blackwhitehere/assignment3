@@ -75,12 +75,49 @@ object GradientChecker extends App {
     * A very silly block to test if gradient checking is working.
     * Will only work if the implementation of the Dot block is already correct
     */
+
+  /*val a = VectorParam(15)
+  val b = VectorParam(15)
+
+  //Dot product
+  val simpleBlock1 = Dot(a,b)
+  GradientChecker(simpleBlock1, b)
+
+  //Sigmoid
+  val simpleBlock2 = Sigmoid(Dot(a,b))
+  GradientChecker(simpleBlock2, b)
+
+  //loglikelihood
+  val simpleBlock3 = NegativeLogLikelihoodLoss(Sigmoid(Dot(a,b)),1.0)
+  GradientChecker(simpleBlock3, b)
+
+  //l2
+  val mat=MatrixParam(15,15)
+  val simpleBlock4 = L2Regularization(0.1,Mul(mat,b))
+  GradientChecker(simpleBlock4,mat)*/
+
+  //sum of words
+  val model = new SumOfWordVectorsModel(15,0.1)
+  val word1 =model.wordToVector("the")
+  val word2 = model.wordToVector("my")
+  val sentence = model.wordVectorsToSentenceVector(Seq(word1,word2))
+  val score = model.scoreSentence(sentence)
+  val l2reg = model.regularizer(Seq(word1,word2))
+
+  GradientChecker(score,model.vectorParams("the"))
+  GradientChecker(l2reg,model.vectorParams("the"))
+  GradientChecker(model.loss(Seq("my","the"),false),model.vectorParams("the"))
+
+
+  /*
+    //mul
+
+    val simpleBlock4=Dot(Mul(mat,b),b)
+    GradientChecker(simpleBlock4,b)*/
+
   // for problem2
-  val a = vec(-1.5, 1.0, 1.5, 0.5)
-  val b = VectorParam(4)
-  b.set(vec(1.0, 2.0, -0.5, 2.5))
-  val c = vec(1,2,3,1)
-  val d = Seq[Block[Vector]](a,b)
-  val simpleBlock = Dot(a,b)
-  GradientChecker(simpleBlock, b)
+  /*val a = MatrixParam(3,3)
+  val b = VectorParam(3)
+  val simpleBlock = Dot(Tanh(Mul(a,b)),b)
+  GradientChecker(simpleBlock, b)*/
 }
