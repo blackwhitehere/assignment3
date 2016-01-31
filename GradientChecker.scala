@@ -76,9 +76,9 @@ object GradientChecker extends App {
     * Will only work if the implementation of the Dot block is already correct
     */
 
-  /*val a = VectorParam(15)
-  val b = VectorParam(15)
-
+  val a = VectorParam(12)
+  val b = VectorParam(12)
+  /*
   //Dot product
   val simpleBlock1 = Dot(a,b)
   GradientChecker(simpleBlock1, b)
@@ -104,20 +104,25 @@ object GradientChecker extends App {
   val score = model.scoreSentence(sentence)
   val l2reg = model.regularizer(Seq(word1,word2))
 
-  GradientChecker(score,model.vectorParams("the"))
+  /*GradientChecker(score,model.vectorParams("the"))
   GradientChecker(l2reg,model.vectorParams("the"))
-  GradientChecker(model.loss(Seq("my","the"),false),model.vectorParams("the"))
+  GradientChecker(model.loss(Seq("my","the"),false),model.vectorParams("the"))*/
 
+  //rNN
 
-  /*
-    //mul
+  val rnn= new RecurrentNeuralNetworkModel(12,12,0.1,0.01)
+  val word11 =rnn.wordToVector("the")
+  val word22= rnn.wordToVector("my")
+  val sentence2 = rnn.wordVectorsToSentenceVector(Seq(word11,word22))
+  val score2 = rnn.scoreSentence(sentence2)
+  val l2reg2 =rnn.regularizer(Seq(word11,word22))
 
-    val simpleBlock4=Dot(Mul(mat,b),b)
-    GradientChecker(simpleBlock4,b)*/
+  //GradientChecker(score2,rnn.vectorParams("the"))
+  //GradientChecker(l2reg2,rnn.vectorParams("the"))
+  //GradientChecker(rnn.loss(Seq("my","the"),false),rnn.vectorParams("the"))
 
-  // for problem2
-  /*val a = MatrixParam(3,3)
-  val b = VectorParam(3)
-  val simpleBlock = Dot(Tanh(Mul(a,b)),b)
-  GradientChecker(simpleBlock, b)*/
+  //Mul
+  val mat = MatrixParam(15,15)
+  val block =Dot(Mul(mat,b),a)
+  GradientChecker(Dot(sentence2,word22),rnn.vectorParams("the"))
 }

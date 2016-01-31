@@ -21,11 +21,11 @@ object Main extends App {
     val rtn = (iter,accLoss,100 * Evaluator(model, trainSetName), 100*Evaluator(model, validationSetName))
     rtn
   }
-  val learningRate = Seq(0.01) //grid
-  val vectorRegularizationStrength = Seq(0.001) //grid
-  val matrixRegularizationStrength = Seq(0.001)
-  val wordDim = Seq(20)
-  val hiddenDim = Seq(10)
+  val learningRate = Seq(0.005,0.01) //grid
+  val vectorRegularizationStrength = Seq(0.01,0.05) //grid
+  val matrixRegularizationStrength = Seq(0.01,0.05)
+  val wordDim = Seq(15,20)
+  val hiddenDim = Seq(10,15)
 
   val trainSetName = "train"
   val validationSetName = "dev"
@@ -38,7 +38,7 @@ object Main extends App {
        hidDim<-hiddenDim){
     val model: Model = new RecurrentNeuralNetworkModel(wrdDim, hidDim, vecReg, matReg)
     //model.matrixParams.foreach(a=>a._2.initialize(()=>random.nextGaussian()*0.5))
-    val stats=StochasticGradientDescentLearner(model, trainSetName, 5, learn, epochHook)
+    val stats=StochasticGradientDescentLearner(model, trainSetName, 2, learn, epochHook)
     ParamPentas += (vecReg,matReg,learn,wrdDim,hidDim) -> stats.last._4 //validation error rate on last epoch
 
   }
