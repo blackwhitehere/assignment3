@@ -1,5 +1,6 @@
 package uk.ac.ucl.cs.mr.statnlpbook.assignment3
 
+import breeze.linalg.DenseVector
 import uk.ac.ucl.cs.mr.statnlpbook.assignment3.LossSum
 
 import scala.collection.mutable
@@ -113,37 +114,35 @@ class SumOfWordVectorsModel(embeddingSize: Int, regularizationStrength: Double =
 class RecurrentNeuralNetworkModel(embeddingSize: Int, hiddenSize: Int,
                                   vectorRegularizationStrength: Double = 0.0,
                                   matrixRegularizationStrength: Double = 0.0) extends Model {
-  override val vectorParams = mutable.HashMap[String, VectorParam]()
+  override val vectorParams: mutable.HashMap[String, VectorParam] =
+    LookupTable.trainableWordVectors
   vectorParams += "param_w" -> VectorParam(hiddenSize)
   vectorParams += "param_h0" -> VectorParam(hiddenSize)
   vectorParams += "param_b" -> VectorParam(hiddenSize)
 
-  override val matrixParams: mutable.HashMap[String, MatrixParam] = new mutable.HashMap[String, MatrixParam]()
+  val p = 0.5
+
+  override val matrixParams: mutable.HashMap[String, MatrixParam] =
+    new mutable.HashMap[String, MatrixParam]()
   matrixParams += "param_Wx" -> MatrixParam(hiddenSize, embeddingSize)
   matrixParams += "param_Wh" -> MatrixParam(hiddenSize, hiddenSize)
 
-  def wordToVector(word: String): Block[Vector] ={
-    if (vectorParams.contains(word)) {
-      vectorParams(word)
-    } else {
-      vectorParams.getOrElseUpdate(word, VectorParam(embeddingSize))
-    }
-  }
+  def wordToVector(word: String): Block[Vector] =LookupTable.addTrainableWordVector(word,embeddingSize)
 
-  def wordVectorsToSentenceVector(words: Seq[Block[Vector]]): Block[Vector] ={
-    words.foldLeft(vectorParams("param_h0"):Block[Vector])((a,b)=>
-      Tanh(
-        Sum(
-          Seq(
-            Mul(matrixParams("param_Wh"),a),
-            Mul(matrixParams("param_Wx"),b),
-            vectorParams("param_b")
-          )
-        )
-      )
-    )
-  }
+  val fileinput = io.Source.fromFile("/Users/yangyijing/Desktop/glove.twitter.27B/glove.twitter.27B.25d.txt", "utf-8")
+  fileinput.getLines().foreach(line=>{
+    val words = line.split(" ")
+    val vectors = words.slice(1,words.size).map(w=>w.toDouble*0.1)
+    LookupTable.addTrainableWordVector(words(0),DenseVector(vectors))
+  })
 
+  def wordVectorsToSentenceVector(words: Seq[Block[Vector]]): Block[Vector] = {
+
+
+    words.map(Dropout(p,_)).filter(_.prob > p).foldLeft(vectorParams("param_h0"):Block[Vector])((a,b)=>Tanh(Sum(Seq(Mul(matrixParams("param_Wh"),a),Mul(matrixParams("param_Wx"),b),vectorParams("param_b")))))
+
+    //words.foldLeft(vectorParams("param_h0"): Block[Vector])((a, b) => Tanh(Sum(Seq(Mul(matrixParams("param_Wh"), a), Mul(matrixParams("param_Wx"), b), vectorParams("param_b")))))
+  }
   def scoreSentence(sentence: Block[Vector]): Block[Double] = Sigmoid(Dot(vectorParams("param_w"),sentence))
 
   def regularizer(words: Seq[Block[Vector]]): Loss =
