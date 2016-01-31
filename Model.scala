@@ -1,5 +1,6 @@
 package uk.ac.ucl.cs.mr.statnlpbook.assignment3
 
+import breeze.linalg.DenseVector
 import uk.ac.ucl.cs.mr.statnlpbook.assignment3.LossSum
 
 import scala.collection.mutable
@@ -102,6 +103,7 @@ class SumOfWordVectorsModel(embeddingSize: Int, regularizationStrength: Double =
 
 }
 
+
 /**
  * Problem 3
  * A recurrent neural network model
@@ -118,7 +120,7 @@ class RecurrentNeuralNetworkModel(embeddingSize: Int, hiddenSize: Int,
   vectorParams += "param_h0" -> VectorParam(hiddenSize)
   vectorParams += "param_b" -> VectorParam(hiddenSize)
 
-  override val matrixParams: mutable.HashMap[String, MatrixParam] = new mutable.HashMap[String, MatrixParam]()
+  override val matrixParams: mutable.HashMap[String, MatrixParam] = mutable.HashMap[String, MatrixParam]()
   matrixParams += "param_Wx" -> MatrixParam(hiddenSize, embeddingSize)
   matrixParams += "param_Wh" -> MatrixParam(hiddenSize, hiddenSize)
 
@@ -144,6 +146,58 @@ class RecurrentNeuralNetworkModel(embeddingSize: Int, hiddenSize: Int,
     )
   }
 
+  def scoreSentence(sentence: Block[Vector]): Block[Double] = Sigmoid(Dot(vectorParams("param_w"),sentence))
+
+  def regularizer(words: Seq[Block[Vector]]): Loss =
+    new LossSum(
+      L2Regularization(vectorRegularizationStrength, words :+ vectorParams("param_w") :+ vectorParams("param_h0") :+ vectorParams("param_b"):_*),
+      L2Regularization(matrixRegularizationStrength, matrixParams("param_Wx"), matrixParams("param_Wh"))
+    )
+}
+
+
+
+
+/**
+ * Problem 4
+ * Modified recurrent neural network model
+ * @param embeddingSize dimension of the word vectors used in this model
+ * @param hiddenSize dimension of the hidden state vector used in this model
+ * @param vectorRegularizationStrength strength of the regularization on the word vectors and global parameter vector w
+ * @param matrixRegularizationStrength strength of the regularization of the transition matrices used in this model
+ */
+class RecurrentNeuralNetworkModelP4(embeddingSize: Int, hiddenSize: Int,
+                                  vectorRegularizationStrength: Double = 0.0,
+                                  matrixRegularizationStrength: Double = 0.0) extends Model {
+  override val vectorParams: mutable.HashMap[String, VectorParam] =
+    LookupTable.trainableWordVectors
+  vectorParams += "param_w" -> VectorParam(hiddenSize)
+  vectorParams += "param_h0" -> VectorParam(hiddenSize)
+  vectorParams += "param_b" -> VectorParam(hiddenSize)
+
+  val p = 0.5
+
+  override val matrixParams: mutable.HashMap[String, MatrixParam] =
+    new mutable.HashMap[String, MatrixParam]()
+  matrixParams += "param_Wx" -> MatrixParam(hiddenSize, embeddingSize)
+  matrixParams += "param_Wh" -> MatrixParam(hiddenSize, hiddenSize)
+
+  def wordToVector(word: String): Block[Vector] =LookupTable.addTrainableWordVector(word,embeddingSize)
+
+  val fileinput = io.Source.fromFile("./glove.twitter.27B.25d.txt", "utf-8")
+  fileinput.getLines().foreach(line=>{
+    val words = line.split(" ")
+    val vectors = words.slice(1,words.size).map(w=>w.toDouble*0.1)
+    LookupTable.addTrainableWordVector(words(0),DenseVector(vectors))
+  })
+
+  def wordVectorsToSentenceVector(words: Seq[Block[Vector]]): Block[Vector] = {
+
+
+    words.map(Dropout(p,_)).filter(_.prob > p).foldLeft(vectorParams("param_h0"):Block[Vector])((a,b)=>Tanh(Sum(Seq(Mul(matrixParams("param_Wh"),a),Mul(matrixParams("param_Wx"),b),vectorParams("param_b")))))
+
+    //words.foldLeft(vectorParams("param_h0"): Block[Vector])((a, b) => Tanh(Sum(Seq(Mul(matrixParams("param_Wh"), a), Mul(matrixParams("param_Wx"), b), vectorParams("param_b")))))
+  }
   def scoreSentence(sentence: Block[Vector]): Block[Double] = Sigmoid(Dot(vectorParams("param_w"),sentence))
 
   def regularizer(words: Seq[Block[Vector]]): Loss =
