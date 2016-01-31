@@ -76,11 +76,8 @@ object GradientChecker extends App {
     * Will only work if the implementation of the Dot block is already correct
     */
   // for problem2
-  val a = vec(-1.5, 1.0, 1.5, 0.5)
-  val b = VectorParam(4)
-  b.set(vec(1.0, 2.0, -0.5, 2.5))
-  val c = vec(1,2,3,1)
-  val d = Seq[Block[Vector]](a,b)
-  val simpleBlock = Dot(a,b)
+  val a = MatrixParam(3,3)
+  val b = VectorParam(3)
+  val simpleBlock = Dot(Tanh(Mul(a,b)),b)
   GradientChecker(simpleBlock, b)
 }
