@@ -349,6 +349,7 @@ case class Dropout(prob: Double, arg: Block[Vector]) extends Block[Vector] {
 /**
   * ... be free, be creative :)
   */
+/*
 case class Multiplication(arg1: Block[Vector], arg2: Block[Vector]) extends Block[Vector] {
   def forward(): Vector = {
     output = arg1.forward() * arg2.forward()
@@ -362,4 +363,4 @@ case class Multiplication(arg1: Block[Vector], arg2: Block[Vector]) extends Bloc
     arg1.update(learningRate)
     arg2.update(learningRate)
   }
-}
+}*/
