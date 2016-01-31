@@ -148,7 +148,7 @@ class RecurrentNeuralNetworkModel(embeddingSize: Int, hiddenSize: Int,
 
   def regularizer(words: Seq[Block[Vector]]): Loss =
     new LossSum(
-      L2Regularization(vectorRegularizationStrength, words :+ vectorParams("param_w"):_*),
+      L2Regularization(vectorRegularizationStrength, words :+ vectorParams("param_w") :+ vectorParams("param_h0") :+ vectorParams("param_b"):_*),
       L2Regularization(matrixRegularizationStrength, matrixParams("param_Wx"), matrixParams("param_Wh"))
     )
 }

@@ -52,7 +52,7 @@ trait DefaultInitialization {
  * This trait defines a default way of initializing weights of parameters
  */
 trait GaussianDefaultInitialization extends DefaultInitialization {
-  def defaultInitialization(): Double = random.nextGaussian() * 0.2
+  def defaultInitialization(): Double = random.nextGaussian() * 0.1
 }
 
 /**
@@ -334,17 +334,32 @@ case class Tanh(arg: Block[Vector]) extends Block[Vector] {
  * @param arg a block evaluating to a vector whose components we want to drop
  */
 case class Dropout(prob: Double, arg: Block[Vector]) extends Block[Vector] {
+  val p = Math.random()
   def forward(): Vector = {
-    output = arg.forward() * prob
-    output
+//    if (p > prob){
+      output = arg.forward()
+      output
+//    }
   }
   def update(learningRate: Double): Unit = arg.update(learningRate)
-  def backward(gradient: Vector): Unit = {
-    arg.backward( prob * gradient )
+  def backward(gradient: Vector): Unit = arg.backward(gradient)
 
-  }
 }
 
 /**
   * ... be free, be creative :)
   */
+case class Multiplication(arg1: Block[Vector], arg2: Block[Vector]) extends Block[Vector] {
+  def forward(): Vector = {
+    output = arg1.forward() * arg2.forward()
+    output
+  }
+  def backward(gradient: Vector): Unit = {
+    arg1.backward()
+    arg2.backward()
+  }
+  def update(learningRate: Double): Unit = {
+    arg1.update(learningRate)
+    arg2.update(learningRate)
+  }
+}
