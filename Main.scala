@@ -49,7 +49,7 @@ object Main extends App {
   )
   val bestModel: Model = new RecurrentNeuralNetworkModel(bestWrdDim, bestHidDim, bestVecReg, bestMatReg)*/
   val bestModel: Model = new RecurrentNeuralNetworkModel(15, 15, 0.01, 0.01)
-  val stats=StochasticGradientDescentLearner(bestModel, trainSetName, 20, 0.01, epochHook)
+  val stats=StochasticGradientDescentLearner(bestModel, trainSetName, 20, 0.005, epochHook)
 
   val statsStr=stats.mkString("\n")
   scala.tools.nsc.io.File("stats.csv").writeAll(statsStr)
