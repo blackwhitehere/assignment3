@@ -184,7 +184,7 @@ class RecurrentNeuralNetworkModelP4(embeddingSize: Int, hiddenSize: Int,
 
   def wordToVector(word: String): Block[Vector] =LookupTable.addTrainableWordVector(word,embeddingSize)
 
-  val fileinput = io.Source.fromFile("./glove.twitter.27B.25d.txt", "utf-8")
+  val fileinput = io.Source.fromFile("./glove.twitter.27B.25d.txt", "utf-8") //
   fileinput.getLines().foreach(line=>{
     val words = line.split(" ")
     val vectors = words.slice(1,words.size).map(w=>w.toDouble*0.1)

@@ -67,6 +67,6 @@ object SentimentAnalysisCorpus {
         testCounter = -1
       }
       testCounter = testCounter + 1
-      test(debugCounter)
+      test(testCounter)
   }
 }

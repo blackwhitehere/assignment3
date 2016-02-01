@@ -80,6 +80,7 @@ object GradientChecker extends App {
   val a = VectorParam(12)
   val b = VectorParam(12)
   /*
+  //GENERAL TESTS ON SIMPLE BLOCKS
   //Dot product
   val simpleBlock1 = Dot(a,b)
   GradientChecker(simpleBlock1, b)
@@ -95,7 +96,8 @@ object GradientChecker extends App {
   //l2
   val mat=MatrixParam(15,15)
   val simpleBlock4 = L2Regularization(0.1,Mul(mat,b))
-  GradientChecker(simpleBlock4,mat)*/
+  GradientChecker(simpleBlock4,mat)
+  */
 
   //sum of words
   val model = new SumOfWordVectorsModel(15,0.1)
@@ -121,6 +123,7 @@ object GradientChecker extends App {
   //GradientChecker(l2reg2,rnn.vectorParams("the"))
   //GradientChecker(rnn.loss(Seq("my","the"),false),rnn.vectorParams("the"))
 
+  //Evaluation of RNN computation blocks
   val a1:Block[Vector] = a
   val b1 = MatrixParam(2,4)
   b1.set(DenseMatrix((1.0,1.5,-0.5,1.5),(1.0,1.0,-0.6,1.4)))

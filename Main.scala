@@ -15,20 +15,21 @@ object Main extends App {
    *
    * Problems 2/3/4: perform a grid search over the parameters below
    */
+  val trainSetName = "train"
+  val validationSetName = "dev"
   def epochHook(model:Model, iter: Int, accLoss: Double): (Int,Double,Double,Double) = {
     println("Epoch %4d\tLoss %8.4f\tTrain Acc %4.2f\tDev Acc %4.2f".format(
       iter, accLoss, 100 * Evaluator(model, trainSetName), 100*Evaluator(model, validationSetName)))
     val rtn = (iter,accLoss,100 * Evaluator(model, trainSetName), 100*Evaluator(model, validationSetName))
     rtn
   }
-  val learningRate = Seq(0.005,0.01) //grid
+  /*val learningRate = Seq(0.005,0.01) //grid
   val vectorRegularizationStrength = Seq(0.01,0.05) //grid
   val matrixRegularizationStrength = Seq(0.01,0.05)
-  val wordDim = Seq(15,20)
-  val hiddenDim = Seq(10,15)
+  val wordDim = Seq(15)
+  val hiddenDim = Seq(15)
 
-  val trainSetName = "train"
-  val validationSetName = "dev"
+
   val ParamPentas = collection.mutable.HashMap[(Double,Double,Double,Int,Int),Double]()
 
   for (learn<-learningRate;
@@ -38,7 +39,7 @@ object Main extends App {
        hidDim<-hiddenDim){
     val model: Model = new RecurrentNeuralNetworkModel(wrdDim, hidDim, vecReg, matReg)
     //model.matrixParams.foreach(a=>a._2.initialize(()=>random.nextGaussian()*0.5))
-    val stats=StochasticGradientDescentLearner(model, trainSetName, 2, learn, epochHook)
+    val stats=StochasticGradientDescentLearner(model, trainSetName, 10, learn, epochHook)
     ParamPentas += (vecReg,matReg,learn,wrdDim,hidDim) -> stats.last._4 //validation error rate on last epoch
 
   }
@@ -46,8 +47,9 @@ object Main extends App {
   println("the best vector regularization parameter is %4.2f\t, best matrix reg parameter is %4.2f\t, best learning rate is %4.2f\t best word dimension is %4d\t, best hidden word dimension is %4d\t".format(
     bestVecReg, bestMatReg, bestLearn,bestWrdDim,bestHidDim)
   )
-  val bestModel: Model = new RecurrentNeuralNetworkModel(bestWrdDim, bestHidDim, bestVecReg, bestMatReg)
-  val stats=StochasticGradientDescentLearner(bestModel, trainSetName, 10, bestLearn, epochHook)
+  val bestModel: Model = new RecurrentNeuralNetworkModel(bestWrdDim, bestHidDim, bestVecReg, bestMatReg)*/
+  val bestModel: Model = new RecurrentNeuralNetworkModel(15, 15, 0.01, 0.01)
+  val stats=StochasticGradientDescentLearner(bestModel, trainSetName, 20, 0.01, epochHook)
 
   val statsStr=stats.mkString("\n")
   scala.tools.nsc.io.File("stats.csv").writeAll(statsStr)
